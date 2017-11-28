@@ -13,15 +13,13 @@ export const CAMPAIGN_LAUNCH = 'CAMPAIGN_LAUNCH'
 
 export const createCampaign = (campaignParams) => (dispatch) => {
   dispatch({type: CAMPAIGN_CREATE})
-  const defaultProps = { symptoms: [], langs: [], name: '', audios: [] }
+  const defaultProps = { symptoms: [], langs: [], name: '', audios: [], forwardingCondition: 'any', retryMode: 'sms', retryAfter: '', retryAfterHours: false }
   const params = assign({}, defaultProps, campaignParams)
 
   api.createCampaign(params)
      .then((campaign) => {
-       const campaignWithDefaults = {...campaign, forwardingCondition: 'any'}
-       dispatch(campaignCreated(campaignWithDefaults))
-       dispatch(campaignUpdate(campaignWithDefaults))
-       dispatch(push(`/campaigns/${campaignWithDefaults.id}`))
+       dispatch(campaignCreated(campaign))
+       dispatch(push(`/campaigns/${campaign.id}`))
      })
 }
 

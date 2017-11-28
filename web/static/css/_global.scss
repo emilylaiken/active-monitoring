@@ -95,6 +95,81 @@
   }
 }
 
+.sms-attempts, .ivr-attempts {
+  li {
+    display: inline-block;
+    vertical-align: text-top;
+    margin-right: 15px;
+    position: relative;
+    span {
+      color: $md-grey-300;
+      font-size: 12px;
+      display: inline-block;
+      padding: 0 15px 0 12px;
+      vertical-align: bottom;
+      border-top: 1px solid $md-grey-300;
+      position: relative;
+      &:after {
+        color: $md-grey-300;
+        content: 'keyboard_arrow_right';
+        font-family: 'Material Icons';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 11px;
+        line-height: 1.158;
+        letter-spacing: normal;
+        text-transform: none;
+        text-rendering: optimizeLegibility;
+        font-feature-settings: 'liga';
+        position: absolute;
+        top: -6px;
+        right: -6px;
+      }
+    }
+    &:after {
+      color: $md-black-base;
+      font-family: 'Material Icons';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: 'liga';
+      margin-left: 10px;
+    }
+    &:first-child {
+      i {
+        margin-right: 10px;
+      }
+      &:after {
+        display: none;
+      }
+    }
+  }
+}
+
+.sms-attempts {
+  li {
+    &:after {
+      content: 'sms';
+    }
+  }
+}
+
+.ivr-attempts {
+  li {
+    &:after {
+      content: 'phone';
+    }
+  }
+}
+
+.text-between-controls {
+  line-height: 40px;
+}
+
 section {
   min-height: 100vh;
   h1 {
