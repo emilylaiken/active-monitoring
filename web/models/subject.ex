@@ -16,7 +16,8 @@ defmodule ActiveMonitoring.Subject do
 
   def changeset(model, params \\ %{}) do
     model
-    |> cast(params, [:phone_number])
+    |> cast(params, [:phone_number, :campaign_id])
+    |> assoc_constraint(:campaign)
   end
 
   def stats(campaign_id) do
