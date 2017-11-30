@@ -1,11 +1,14 @@
 defmodule ActiveMonitoring.SubjectsView do
   use ActiveMonitoring.Web, :view
 
-  def render("index.json", %{subjects: subjects}) do
+  def render("index.json", %{subjects: subjects, count: count}) do
     rendered = subjects |> Enum.map(fn(subject) ->
       render_one(subject)
     end)
-    %{data: rendered}
+    %{
+      data: %{subjects: rendered},
+      meta: %{count: count}
+    }
   end
 
   def render("show.json", %{subject: subject}) do

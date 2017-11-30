@@ -10,13 +10,31 @@ defmodule ActiveMonitoring.SubjectsController do
 
   require Logger
 
-  def index(conn, %{"campaigns_id" => campaign_id}) do
+  def index(conn, %{"campaigns_id" => campaign_id} = params) do
+    limit = Map.get(params, "limit", "50") |> String.to_integer
+    page = Map.get(params, "page", "1") |> String.to_integer
+
+    limit = limit_up_to_50(limit)
+
     subjects = Repo.get!(Campaign, campaign_id)
     |> authorize_campaign(conn)
     |> assoc(:subjects)
+    |> limit(^limit)
+    |> conditional_page(limit, page)
     |> Repo.all
 
-    render(conn, "index.json", subjects: subjects)
+    count = Repo.one(from s in Subject, where: s.campaign_id == ^campaign_id, select: count(s.id))
+
+    render(conn, "index.json", subjects: subjects, count: count)
+  end
+
+  defp limit_up_to_50 limit do
+    if limit in 1..50, do: limit, else: 50
+  end
+
+  defp conditional_page query, limit, page do
+    offset = limit * (page - 1)
+    query |> offset(^offset)
   end
 
   def show(conn, %{"id" => subject_id, "campaigns_id" => campaign_id}) do

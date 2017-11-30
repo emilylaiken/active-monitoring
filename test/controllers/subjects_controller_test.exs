@@ -28,12 +28,18 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
     [subject: subject]
   end
 
+  defp with_many_subjects %{campaign: campaign} do
+    for _ <- 1..100, do: build(:subject, campaign: campaign) |> Repo.insert!
+    :ok
+  end
+
   describe "campaign without subjects" do
     setup [:with_logged_in_user]
 
     test "shows an empty index", %{conn: conn, campaign: campaign} do
       response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
-      assert response["data"] == []
+      assert response["data"]["subjects"] == []
+      assert response["meta"]["count"] == 0
     end
   end
 
@@ -42,10 +48,16 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
 
     test "lists all subjects", %{conn: conn, campaign: campaign, subject: subject} do
       response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
-      assert length(response["data"]) == 4
-      [subject1, subject2 | _] = response["data"]
+      assert length(response["data"]["subjects"]) == 4
+      [subject1, subject2 | _] = response["data"]["subjects"]
       assert subject1["phoneNumber"] == subject.phone_number
       assert subject1["phoneNumber"] != subject2["phoneNumber"]
+    end
+
+    test "lists subjects by page size", %{conn: conn, campaign: campaign} do
+      response = conn |> get(campaigns_subjects_path(conn, :index, campaign, limit: 2)) |> json_response(200)
+      assert length(response["data"]["subjects"]) == 2
+      assert response["meta"]["count"] == 4
     end
 
     test "shows a single subject", %{conn: conn, campaign: campaign, subject: subject} do
@@ -55,7 +67,7 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
 
     test "creates a subject", %{conn: conn, campaign: campaign} do
       response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
-      assert length(response["data"]) == 4
+      assert response["meta"]["count"] == 4
 
       phone_number = "4440000"
 
@@ -68,7 +80,7 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
       assert response["data"]["campaignId"] == campaign.id
 
       response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
-      assert length(response["data"]) == 5
+      assert response["meta"]["count"] == 5
     end
 
     test "updates a subject", %{conn: conn, campaign: campaign, subject: subject} do
@@ -82,6 +94,35 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
       assert response["data"]["id"] == subject.id
       assert response["data"]["phoneNumber"] == phone_number
       assert response["data"]["campaignId"] == campaign.id
+    end
+  end
+
+  describe "pagination with too many subjects" do
+    setup [:with_logged_in_user, :with_many_subjects]
+
+    test "lists subjects by page size when there are too many subjects", %{conn: conn, campaign: campaign} do
+      response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
+      assert length(response["data"]["subjects"]) == 50
+      assert response["meta"]["count"] > 50
+    end
+
+    test "lists subjects by maximum page size when asked for more", %{conn: conn, campaign: campaign} do
+      response = conn |> get(campaigns_subjects_path(conn, :index, campaign, limit: 100)) |> json_response(200)
+      assert length(response["data"]["subjects"]) == 50
+      assert response["meta"]["count"] > 50
+    end
+
+    test "lists second page of subjects", %{conn: conn, campaign: campaign} do
+      response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
+      [first_subject | _ ] = response["data"]["subjects"]
+      first_subject_id = first_subject["id"]
+
+      response = conn |> get(campaigns_subjects_path(conn, :index, campaign, page: 2)) |> json_response(200)
+      assert length(response["data"]["subjects"]) == 50
+      assert response["meta"]["count"] == 100
+      require Logger
+      second_page_subject_ids = Enum.map response["data"]["subjects"], fn(subject) -> subject["id"] end
+      assert not(first_subject_id in second_page_subject_ids)
     end
   end
 
