@@ -124,6 +124,22 @@ export const fetchTimezones = () => {
   return apiFetchJSON('timezones')
 }
 
+export const fetchSubjects = (campaignId) => {
+  return apiFetchJSONWithCallback(`campaigns/${campaignId}/subjects`, null, (json) => {
+    return () => {
+      if (!json) { return null }
+      if (json.errors) {
+        console.log(json.errors)
+      }
+      return {count: json.meta.count, subjects: json.data.subjects}
+    }
+  })
+}
+
+export const createSubject = (campaignId, subject) => {
+  return apiPostJSON(`campaigns/${campaignId}/subjects`, { subject })
+}
+
 export const createAudio = (files) => {
   return apiPostFile('audios', files[0])
 }

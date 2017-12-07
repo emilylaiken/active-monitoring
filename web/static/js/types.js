@@ -16,6 +16,11 @@ export type Campaign = {
   channel: ?string,
 };
 
+export type Subject = {
+  id: number,
+  phoneNumber: string,
+}
+
 export type State = {
   timezones: {
     fetching: boolean,
