@@ -19,6 +19,7 @@ defmodule ActiveMonitoring.SubjectsView do
     %{
       id: subject.id,
       campaign_id: subject.campaign_id,
+      registration_identifier: subject.registration_identifier,
       phone_number: subject.phone_number,
     }
   end

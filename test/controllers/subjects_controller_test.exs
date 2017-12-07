@@ -47,11 +47,13 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
     setup [:with_logged_in_user, :with_campaign_subjects]
 
     test "lists all subjects", %{conn: conn, campaign: campaign, subject: subject} do
+      assert subject.registration_identifier != nil
       response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
       assert length(response["data"]["subjects"]) == 4
       [subject1, subject2 | _] = response["data"]["subjects"]
       assert subject1["phoneNumber"] == subject.phone_number
       assert subject1["phoneNumber"] != subject2["phoneNumber"]
+      assert subject1["registrationIdentifier"] == subject.registration_identifier
     end
 
     test "lists subjects by page size", %{conn: conn, campaign: campaign} do
@@ -63,6 +65,7 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
     test "shows a single subject", %{conn: conn, campaign: campaign, subject: subject} do
       response = conn |> get(campaigns_subjects_path(conn, :show, campaign, subject)) |> json_response(200)
       assert response["data"]["phoneNumber"] == subject.phone_number
+      assert response["data"]["registrationIdentifier"] == subject.registration_identifier
     end
 
     test "creates a subject", %{conn: conn, campaign: campaign} do
@@ -70,14 +73,16 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
       assert response["meta"]["count"] == 4
 
       phone_number = "4440000"
+      registration_identifier = "12341234"
 
       response = conn
-      |> post(campaigns_subjects_path(conn, :create, campaign), subject: %{phone_number: phone_number})
+      |> post(campaigns_subjects_path(conn, :create, campaign), subject: %{phone_number: phone_number, registration_identifier: registration_identifier})
       |> json_response(201)
 
       assert response["data"]["id"]
       assert response["data"]["phoneNumber"] == phone_number
       assert response["data"]["campaignId"] == campaign.id
+      assert response["data"]["registrationIdentifier"] == registration_identifier
 
       response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
       assert response["meta"]["count"] == 5
@@ -85,14 +90,17 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
 
     test "updates a subject", %{conn: conn, campaign: campaign, subject: subject} do
       phone_number = "4440000"
+      registration_identifier = "12341234"
       assert subject.phone_number != phone_number
+      assert subject.registration_identifier != registration_identifier
 
       response = conn
-      |> patch(campaigns_subjects_path(conn, :update, campaign, subject), subject: %{phone_number: phone_number})
+      |> patch(campaigns_subjects_path(conn, :update, campaign, subject), subject: %{phone_number: phone_number, registration_identifier: registration_identifier})
       |> json_response(200)
 
       assert response["data"]["id"] == subject.id
       assert response["data"]["phoneNumber"] == phone_number
+      assert response["data"]["registrationIdentifier"] == registration_identifier
       assert response["data"]["campaignId"] == campaign.id
     end
   end
