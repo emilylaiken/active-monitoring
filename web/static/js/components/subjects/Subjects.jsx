@@ -30,7 +30,7 @@ class SubjectsList extends Component {
       return (
         <EmptyListing image='/images/person.svg'>
           <h5>You have no subjects on this project</h5>
-          <NavLink to='#' onClick={this.props.createSubject}>Add subjects</NavLink>
+          <NavLink to='#' onClick={this.props.createSubject}>Add subject</NavLink>
         </EmptyListing>
       )
     }
@@ -42,9 +42,8 @@ class SubjectsList extends Component {
             <DataTable plain className='app-listing'>
               <TableHeader>
                 <TableRow>
-                  <TableColumn>Name</TableColumn>
-                  <TableColumn>Role</TableColumn>
-                  <TableColumn>Last Activity</TableColumn>
+                  <TableColumn>ID</TableColumn>
+                  <TableColumn>Phone Number</TableColumn>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -91,8 +90,8 @@ class SubjectItem extends Component {
     const subject = this.props.subject
     return (
       <TableRow onClick={() => this.props.onClick(subject.id)}>
+        <TableColumn>{subject.registrationIdentifier}</TableColumn>
         <TableColumn>{subject.phoneNumber}</TableColumn>
-        <TableColumn>...</TableColumn>
       </TableRow>
     )
   }
@@ -136,14 +135,14 @@ class Subjects extends Component {
   }
 
   pageTitle() {
-    return 'Campaigns!'
+    return 'Subjects!'
   }
 
   render() {
     return (
       <div className='md-grid--no-spacing'>
         <SubNav addButtonHandler={() => this.createSubject()}>
-          Campaigns
+          Subjects
         </SubNav>
         <SubjectsList
           items={this.props.subjects.items}

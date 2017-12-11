@@ -19,6 +19,7 @@ export type Campaign = {
 export type Subject = {
   id: number,
   phoneNumber: string,
+  registrationIdentifier: string,
 }
 
 export type State = {
