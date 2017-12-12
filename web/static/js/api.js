@@ -140,6 +140,10 @@ export const createSubject = (campaignId, subject) => {
   return apiPostJSON(`campaigns/${campaignId}/subjects`, { subject })
 }
 
+export const updateSubject = (campaignId, subject) => {
+  return apiPutJSON(`campaigns/${campaignId}/subjects/${subject.id}`, { subject })
+}
+
 export const createAudio = (files) => {
   return apiPostFile('audios', files[0])
 }

@@ -1,12 +1,13 @@
 import * as api from '../api'
 import { SERVER_ERROR } from './shared'
-import { push } from 'react-router-redux'
 import assign from 'lodash/assign'
 
 export const SUBJECT_CREATE = 'SUBJECT_CREATE'
 export const SUBJECT_CREATED = 'SUBJECT_CREATED'
 export const SUBJECT_FETCH = 'SUBJECT_FETCH'
 export const SUBJECT_FETCHED = 'SUBJECT_FETCHED'
+export const SUBJECT_EDIT = 'SUBJECT_EDIT'
+export const SUBJECT_EDITING = 'SUBJECT_EDITING'
 export const SUBJECT_UPDATE = 'SUBJECT_UPDATE'
 export const SUBJECT_UPDATED = 'SUBJECT_UPDATED'
 export const SUBJECT_LAUNCH = 'SUBJECT_LAUNCH'
@@ -19,9 +20,20 @@ export const createSubject = (campaignId, subjectParams) => (dispatch) => {
   api.createSubject(campaignId, params)
      .then((subject) => {
        dispatch(subjectCreated(subject))
-       dispatch(push(`/campaigns/${campaignId}/subjects/${subject.id}`))
      })
 }
+
+export const editingSubjectCancel = () => {
+  return { type: SUBJECT_EDIT, subject: null }
+}
+
+export const editSubject = (subject) => {
+  return { type: SUBJECT_EDIT, subject }
+}
+
+export const subjectEditing = (fieldName, value) => (
+  { type: SUBJECT_EDITING, fieldName, value }
+)
 
 export const subjectCreated = (subject) => {
   return { type: SUBJECT_CREATED, subject }

@@ -10,17 +10,20 @@ import TableHeader from 'react-md/lib/DataTables/TableHeader'
 import TableBody from 'react-md/lib/DataTables/TableBody'
 import TableRow from 'react-md/lib/DataTables/TableRow'
 import TableColumn from 'react-md/lib/DataTables/TableColumn'
-import TablePagination from 'react-md/lib/DataTables/TablePagination'
+import Dialog from 'react-md/lib/Dialogs'
 
 import * as collectionActions from '../../actions/subjects'
 import * as itemActions from '../../actions/subject'
 import EmptyListing from '../EmptyListing'
+import SubjectForm from './SubjectForm'
 import SubNav from '../SubNav'
-import type { Subject } from '../../types'
+import type { Subject, SubjectParams } from '../../types'
 
 class SubjectsList extends Component {
-  handlePagination() {
-    debugger
+  props: {
+    items: Subject[],
+    showSubjectForm: () => void,
+    onSubjectClick: (subject: Subject) => void
   }
 
   render() {
@@ -30,7 +33,7 @@ class SubjectsList extends Component {
       return (
         <EmptyListing image='/images/person.svg'>
           <h5>You have no subjects on this project</h5>
-          <NavLink to='#' onClick={this.props.createSubject}>Add subject</NavLink>
+          <NavLink to='#' onClick={this.props.showSubjectForm}>Add subject</NavLink>
         </EmptyListing>
       )
     }
@@ -49,16 +52,6 @@ class SubjectsList extends Component {
               <TableBody>
                 { subjects.map(s => <SubjectItem key={s.id} subject={s} onClick={this.props.onSubjectClick} />) }
               </TableBody>
-              <TablePagination
-                baseId='subjects-pagination'
-                rows={this.props.count}
-                defaultRowsPerPage={1}
-                rowsPerPageLabel='Rows per page'
-                rowsPerPage={1}
-                rowsPerPageItems={[1, 10, 25, 50]}
-                page={1}
-                onPagination={this.handlePagination}
-              />
             </DataTable>
           </Card>
         </div>
@@ -67,29 +60,16 @@ class SubjectsList extends Component {
   }
 }
 
-// SubjectsList.propTypes = {
-//   createSubject: PropTypes.func.isRequired,
-//   onSubjectClick: PropTypes.func.isRequired,
-//   items: PropTypes.array
-// }
-
 class SubjectItem extends Component {
-  campaignName() {
-    let name = this.props.campaign.name || ''
-    if (name == '') {
-      return <em>Untitled Campaign #{this.props.campaign.id}</em>
-    }
-    const nameMaxLength = 120
-    if (name.length > nameMaxLength) {
-      return `${name.slice(0, nameMaxLength - 3)}...`
-    }
-    return name
+  props: {
+    subject: Subject,
+    onClick: (subject: Subject) => void,
   }
 
   render() {
     const subject = this.props.subject
     return (
-      <TableRow onClick={() => this.props.onClick(subject.id)}>
+      <TableRow onClick={() => this.props.onClick(subject)}>
         <TableColumn>{subject.registrationIdentifier}</TableColumn>
         <TableColumn>{subject.phoneNumber}</TableColumn>
       </TableRow>
@@ -97,28 +77,39 @@ class SubjectItem extends Component {
   }
 }
 
-// SubjectItem.propTypes = {
-//   subject: PropTypes.shape({
-//     phoneNumber: PropTypes.string,
-//     id: PropTypes.number
-//   }).isRequired,
-//   onClick: PropTypes.func.isRequired
-// }
-
 class Subjects extends Component {
   props: {
     campaignId: number,
     subjects: {
       count: number,
-      items: Subject[]
+      items: Subject[],
+      editingSubject: ?SubjectParams
     },
     collectionActions: {
       fetchSubjects: (campaignId: number) => void
     },
     itemActions: {
-      createSubject: (campaignId: number) => void
+      createSubject: (campaignId: number, subject: SubjectParams) => void,
+      editingSubjectCancel: () => void,
+      subjectEditing: (fieldName: string, value: string) => void,
+      editSubject: (subject: SubjectParams) => void,
     },
     navigate: (url: string) => void,
+  }
+
+  closeSubjectFormModal() {
+    this.props.itemActions.editingSubjectCancel()
+  }
+
+  showSubjectForm() {
+    this.props.itemActions.editSubject({phoneNumber: '', registrationIdentifier: ''})
+  }
+
+  onEditPhoneNumber = (value) => this.onEditField('phoneNumber', value)
+  onEditRegistrationIdentifier = (value) => this.onEditField('registrationIdentifier', value)
+
+  onEditField(fieldName, value) {
+    this.props.itemActions.subjectEditing(fieldName, value)
   }
 
   componentWillMount() {
@@ -126,12 +117,16 @@ class Subjects extends Component {
   }
 
   createSubject() {
-    this.props.itemActions.createSubject(this.props.campaignId)
+    if (this.props.subjects.editingSubject != null) {
+      this.props.itemActions.createSubject(this.props.campaignId, this.props.subjects.editingSubject)
+    } else {
+      throw new Error("You can't create without editing a Subject")
+    }
   }
 
-  goToSubject(id) {
+  goToSubject(subject: Subject) {
     const campaignId = this.props.campaignId
-    this.props.navigate(`/campaigns/${campaignId}/subjects/${id}`)
+    this.props.navigate(`/campaigns/${campaignId}/subjects/${subject.id}`)
   }
 
   pageTitle() {
@@ -139,16 +134,30 @@ class Subjects extends Component {
   }
 
   render() {
+    const showDialog = this.props.subjects.editingSubject != null
+    let subjectForm = null
+    if (this.props.subjects.editingSubject != null) {
+      subjectForm = <SubjectForm
+        onSubmit={() => this.createSubject()}
+        onCancel={this.closeSubjectFormModal}
+        subject={this.props.subjects.editingSubject}
+        onEditPhoneNumber={this.onEditPhoneNumber}
+        onEditRegistrationIdentifier={this.onEditRegistrationIdentifier} />
+    }
+
     return (
       <div className='md-grid--no-spacing'>
-        <SubNav addButtonHandler={() => this.createSubject()}>
+        <SubNav addButtonHandler={() => this.showSubjectForm()}>
           Subjects
         </SubNav>
         <SubjectsList
           items={this.props.subjects.items}
           count={this.props.subjects.count}
-          createSubject={() => this.createSubject()}
-          onSubjectClick={(id) => this.goToSubject(id)} />
+          showSubjectForm={this.showSubjectForm}
+          onSubjectClick={(subject) => this.goToSubject(subject)} />
+        <Dialog id='subject-form' visible={showDialog} onHide={() => this.closeSubjectFormModal()} title='Manage Subject'>
+          {subjectForm}
+        </Dialog>
       </div>
     )
   }

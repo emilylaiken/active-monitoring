@@ -14,10 +14,16 @@ export type Campaign = {
   forwardingNumber: ?string,
   monitorDuration: ?number,
   channel: ?string,
-};
+}
 
 export type Subject = {
   id: number,
+  phoneNumber: string,
+  registrationIdentifier: string,
+}
+
+export type SubjectParams = {
+  id?: number,
   phoneNumber: string,
   registrationIdentifier: string,
 }
