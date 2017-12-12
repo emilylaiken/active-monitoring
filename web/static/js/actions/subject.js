@@ -48,11 +48,13 @@ export const subjectFetch = (id) => (dispatch) => {
     })
 }
 
-export const subjectUpdate = (attrs) => (dispatch, getState) => {
-  const newSubject = assign({}, getState().subject.data, attrs)
+export const updateSubject = (campaignId, subjectParams) => (dispatch, getState) => {
+  const newSubject = assign({}, getState().subjects.editingSubject, subjectParams)
 
-  dispatch({type: SUBJECT_UPDATED, subject: newSubject})
-  api.updateSubject(newSubject)
+  api.updateSubject(campaignId, newSubject)
+    .then((subject) => {
+      dispatch({ type: SUBJECT_UPDATED, subject })
+    })
     .catch((message) => {
       dispatch({type: SERVER_ERROR, message})
     })

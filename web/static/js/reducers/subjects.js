@@ -45,6 +45,19 @@ const subjectCreated = (state, subject) => (
   }
 )
 
+const subjectUpdated = (state, subject) => {
+  const index = state.items.findIndex(item => item.id == subject.id)
+  return {
+    ...state,
+    editingSubject: null,
+    items: [
+      ...state.items.slice(0, index),
+      subject,
+      ...state.items.slice(index + 1)
+    ]
+  }
+}
+
 const subjectsReducer = collectionReducer(actions, itemsReducer, defaultFilterProvider, initialState)
 
 export default (state, action) => {
@@ -52,6 +65,7 @@ export default (state, action) => {
     case itemActions.SUBJECT_EDIT: return subjectEdit(state, action.subject)
     case itemActions.SUBJECT_EDITING: return subjectEditing(state, action.fieldName, action.value)
     case itemActions.SUBJECT_CREATED: return subjectCreated(state, action.subject)
+    case itemActions.SUBJECT_UPDATED: return subjectUpdated(state, action.subject)
     default: return subjectsReducer(state, action)
   }
 }

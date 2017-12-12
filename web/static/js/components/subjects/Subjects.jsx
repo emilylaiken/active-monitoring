@@ -3,7 +3,6 @@ import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import React, {Component} from 'react'
 import { NavLink } from 'react-router-dom'
-import { push } from 'react-router-redux'
 import Card from 'react-md/lib/Cards/Card'
 import DataTable from 'react-md/lib/DataTables/DataTable'
 import TableHeader from 'react-md/lib/DataTables/TableHeader'
@@ -90,11 +89,11 @@ class Subjects extends Component {
     },
     itemActions: {
       createSubject: (campaignId: number, subject: SubjectParams) => void,
+      updateSubject: (campaignId: number, subject: SubjectParams) => void,
       editingSubjectCancel: () => void,
       subjectEditing: (fieldName: string, value: string) => void,
       editSubject: (subject: SubjectParams) => void,
-    },
-    navigate: (url: string) => void,
+    }
   }
 
   closeSubjectFormModal() {
@@ -124,9 +123,16 @@ class Subjects extends Component {
     }
   }
 
-  goToSubject(subject: Subject) {
-    const campaignId = this.props.campaignId
-    this.props.navigate(`/campaigns/${campaignId}/subjects/${subject.id}`)
+  updateSubject() {
+    if (this.props.subjects.editingSubject != null) {
+      this.props.itemActions.updateSubject(this.props.campaignId, this.props.subjects.editingSubject)
+    } else {
+      throw new Error("You can't update without editing a Subject")
+    }
+  }
+
+  editSubject(subject: Subject) {
+    this.props.itemActions.editSubject(((subject: any): SubjectParams)) // Subject should work with SubjectParams due compatibility
   }
 
   pageTitle() {
@@ -134,13 +140,14 @@ class Subjects extends Component {
   }
 
   render() {
-    const showDialog = this.props.subjects.editingSubject != null
+    const { editingSubject } = this.props.subjects
+    const showDialog = editingSubject != null
     let subjectForm = null
-    if (this.props.subjects.editingSubject != null) {
+    if (editingSubject != null) {
       subjectForm = <SubjectForm
-        onSubmit={() => this.createSubject()}
-        onCancel={this.closeSubjectFormModal}
-        subject={this.props.subjects.editingSubject}
+        onSubmit={() => editingSubject.id ? this.updateSubject() : this.createSubject()}
+        onCancel={() => this.closeSubjectFormModal()}
+        subject={editingSubject}
         onEditPhoneNumber={this.onEditPhoneNumber}
         onEditRegistrationIdentifier={this.onEditRegistrationIdentifier} />
     }
@@ -154,7 +161,7 @@ class Subjects extends Component {
           items={this.props.subjects.items}
           count={this.props.subjects.count}
           showSubjectForm={this.showSubjectForm}
-          onSubjectClick={(subject) => this.goToSubject(subject)} />
+          onSubjectClick={(subject) => this.editSubject(subject)} />
         <Dialog id='subject-form' visible={showDialog} onHide={() => this.closeSubjectFormModal()} title='Manage Subject'>
           {subjectForm}
         </Dialog>
@@ -170,8 +177,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   collectionActions: bindActionCreators(collectionActions, dispatch),
-  itemActions: bindActionCreators(itemActions, dispatch),
-  navigate: (path) => dispatch(push(path))
+  itemActions: bindActionCreators(itemActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Subjects)
