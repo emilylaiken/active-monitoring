@@ -57,7 +57,7 @@ defmodule ActiveMonitoring.Router do
       resources "/campaigns", CampaignsController, only: [:index, :create, :show, :update, :delete] do
         put "/launch", CampaignsController, :launch, as: :launch
 
-        resources "/subjects", SubjectsController, only: [:index, :create, :show, :update, :delete]
+        resources "/subjects", SubjectsController, only: [:index, :create, :update, :delete]
       end
       resources "/channels", ChannelsController, only: [:index]
       resources "/audios", AudioController, only: [:create]

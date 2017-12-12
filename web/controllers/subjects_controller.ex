@@ -37,15 +37,6 @@ defmodule ActiveMonitoring.SubjectsController do
     query |> offset(^offset)
   end
 
-  def show(conn, %{"id" => subject_id, "campaigns_id" => campaign_id}) do
-    subject = Repo.get!(Campaign, campaign_id)
-      |> authorize_campaign(conn)
-      |> assoc(:subjects)
-      |> Repo.get!(subject_id)
-
-    render(conn, "show.json", subject: subject)
-  end
-
   def create(conn, %{"subject" => subject_params, "campaigns_id" => campaign_id}) do
     campaign = Repo.get!(Campaign, campaign_id)
     |> authorize_campaign(conn)

@@ -62,12 +62,6 @@ defmodule ActiveMonitoring.SubjectsControllerTest do
       assert response["meta"]["count"] == 4
     end
 
-    test "shows a single subject", %{conn: conn, campaign: campaign, subject: subject} do
-      response = conn |> get(campaigns_subjects_path(conn, :show, campaign, subject)) |> json_response(200)
-      assert response["data"]["phoneNumber"] == subject.phone_number
-      assert response["data"]["registrationIdentifier"] == subject.registration_identifier
-    end
-
     test "creates a subject", %{conn: conn, campaign: campaign} do
       response = conn |> get(campaigns_subjects_path(conn, :index, campaign)) |> json_response(200)
       assert response["meta"]["count"] == 4
