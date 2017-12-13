@@ -7,6 +7,7 @@ import Card from 'react-md/lib/Cards/Card'
 import DataTable from 'react-md/lib/DataTables/DataTable'
 import TableHeader from 'react-md/lib/DataTables/TableHeader'
 import TableBody from 'react-md/lib/DataTables/TableBody'
+import TablePagination from 'react-md/lib/DataTables/TablePagination'
 import TableRow from 'react-md/lib/DataTables/TableRow'
 import TableColumn from 'react-md/lib/DataTables/TableColumn'
 import Dialog from 'react-md/lib/Dialogs'
@@ -22,7 +23,10 @@ class SubjectsList extends Component {
   props: {
     items: Subject[],
     showSubjectForm: () => void,
-    onSubjectClick: (subject: Subject) => void
+    onPageChange: (page: number) => void,
+    onSubjectClick: (subject: Subject) => void,
+    currentPage: number,
+    count: number,
   }
 
   render() {
@@ -51,11 +55,24 @@ class SubjectsList extends Component {
               <TableBody>
                 { subjects.map(s => <SubjectItem key={s.id} subject={s} onClick={this.props.onSubjectClick} />) }
               </TableBody>
+              <TablePagination
+               baseId='subjects-pagination'
+                rows={this.props.count}
+                rowsPerPage={3}
+                rowsPerPageItems={[]}
+                page={this.props.currentPage}
+                onPagination={(start, limit) => this.handlePagination(start, limit)}
+              />
             </DataTable>
           </Card>
         </div>
       </div>
     )
+  }
+
+  handlePagination(start, limit) {
+    let page = (start / limit) + 1
+    this.props.onPageChange(page)
   }
 }
 
@@ -82,10 +99,12 @@ class Subjects extends Component {
     subjects: {
       count: number,
       items: Subject[],
-      editingSubject: ?SubjectParams
+      editingSubject: ?SubjectParams,
+      limit: number,
+      page: number
     },
     collectionActions: {
-      fetchSubjects: (campaignId: number) => void
+      fetchSubjects: (campaignId: number, limit: number, page: number) => void
     },
     itemActions: {
       createSubject: (campaignId: number, subject: SubjectParams) => void,
@@ -112,7 +131,11 @@ class Subjects extends Component {
   }
 
   componentWillMount() {
-    this.props.collectionActions.fetchSubjects(this.props.campaignId)
+    this.props.collectionActions.fetchSubjects(this.props.campaignId, this.props.subjects.limit, this.props.subjects.page)
+  }
+
+  goToPage(page: number) {
+    this.props.collectionActions.fetchSubjects(this.props.campaignId, this.props.subjects.limit, page)
   }
 
   createSubject() {
@@ -160,8 +183,10 @@ class Subjects extends Component {
         <SubjectsList
           items={this.props.subjects.items}
           count={this.props.subjects.count}
+          currentPage={1}
           showSubjectForm={() => this.showSubjectForm()}
-          onSubjectClick={(subject) => this.editSubject(subject)} />
+          onSubjectClick={(subject) => this.editSubject(subject)}
+          onPageChange={(page) => this.goToPage(page)} />
         <Dialog id='subject-form' visible={showDialog} onHide={() => this.closeSubjectFormModal()} title='Manage Subject'>
           {subjectForm}
         </Dialog>

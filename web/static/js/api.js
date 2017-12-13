@@ -124,8 +124,8 @@ export const fetchTimezones = () => {
   return apiFetchJSON('timezones')
 }
 
-export const fetchSubjects = (campaignId) => {
-  return apiFetchJSONWithCallback(`campaigns/${campaignId}/subjects`, null, (json) => {
+export const fetchSubjects = (campaignId, limit, page) => {
+  return apiFetchJSONWithCallback(`campaigns/${campaignId}/subjects/?limit=${limit}&page=${page}`, null, (json) => {
     return () => {
       if (!json) { return null }
       if (json.errors) {

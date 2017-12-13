@@ -1,3 +1,5 @@
+import { targetPage } from "./actions/subjects";
+
 // @flow
 export type Step = string
 export type LanguageCode = string
@@ -49,8 +51,9 @@ export type State = {
   },
   campaigns: Campaign,
   subjects: {
-    editingSubject: Subject
-  }
+    editingSubject: Subject,
+    targetPage: number
+  },
 }
 
 export type Items = {

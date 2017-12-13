@@ -11,12 +11,9 @@ const initialState = {
   count: 0,
   filter: null,
   order: null,
-  sortBy: 'updated_at',
-  sortAsc: false,
-  page: {
-    index: 0,
-    size: 5
-  }
+  limit: 3, //FIXME
+  page: 1,
+  targetPage: 1,
 }
 
 const subjectEdit = (state, editingSubject) => (
@@ -58,6 +55,32 @@ const subjectUpdated = (state, subject) => {
   }
 }
 
+
+const receive = (state, items, count, limit, page) => (
+  {
+    ...state,
+    fetching: false,
+    items,
+    count,
+    limit,
+    page
+  }
+)
+
+const fetch = (state) => (
+  {
+    ...state,
+    fetching: true
+  }
+)
+
+const pageXxx = (state, targetPage) => (
+  {
+    ...state,
+    targetPage
+  }
+)
+
 const subjectsReducer = collectionReducer(actions, itemsReducer, defaultFilterProvider, initialState)
 
 export default (state, action) => {
@@ -66,6 +89,9 @@ export default (state, action) => {
     case itemActions.SUBJECT_EDITING: return subjectEditing(state, action.fieldName, action.value)
     case itemActions.SUBJECT_CREATED: return subjectCreated(state, action.subject)
     case itemActions.SUBJECT_UPDATED: return subjectUpdated(state, action.subject)
-    default: return subjectsReducer(state, action)
+    case actions.FETCH: return fetch(state)
+    case actions.RECEIVE: return receive(state, action.items, action.count, action.limit, action.page)
+    case actions.PAGE_XXX: return pageXxx(state, action.page)
+    default: return state || initialState
   }
 }
