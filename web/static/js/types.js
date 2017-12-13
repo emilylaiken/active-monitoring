@@ -47,6 +47,7 @@ export type State = {
   campaign: {
     data: Campaign
   },
+  campaigns: Campaign,
   subjects: {
     editingSubject: Subject
   }
