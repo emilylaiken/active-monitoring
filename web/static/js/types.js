@@ -16,6 +16,18 @@ export type Campaign = {
   channel: ?string,
 }
 
+export type CampaignParams = {
+  id?: number,
+  audios?: Audio[],
+  langs?: string[],
+  symptoms?: string[][],
+  additionalInformation?: ?string,
+  timezone?: Timezone,
+  forwardingNumber?: ?string,
+  monitorDuration?: ?number,
+  channel?: ?string,
+}
+
 export type Subject = {
   id: number,
   phoneNumber: string,
@@ -31,6 +43,9 @@ export type SubjectParams = {
 export type State = {
   timezones: {
     fetching: boolean,
+  },
+  campaign: {
+    data: Campaign
   }
 }
 
@@ -38,5 +53,5 @@ export type Action = {
   type: string,
 }
 
-export type Dispatch = (action: Action) => void
+export type Dispatch = (action: Action | Function) => void
 export type GetState = () => State
