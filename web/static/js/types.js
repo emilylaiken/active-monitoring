@@ -46,7 +46,15 @@ export type State = {
   },
   campaign: {
     data: Campaign
+  },
+  subjects: {
+    editingSubject: Subject
   }
+}
+
+export type Items = {
+  subjects: [Subject],
+  count: number
 }
 
 export type Action = {

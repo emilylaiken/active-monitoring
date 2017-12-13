@@ -1,6 +1,8 @@
+// @flow
 import * as api from '../api'
 import { SERVER_ERROR } from './shared'
 import assign from 'lodash/assign'
+import type { SubjectParams, Subject, Dispatch, GetState } from '../types'
 
 export const SUBJECT_CREATE = 'SUBJECT_CREATE'
 export const SUBJECT_CREATED = 'SUBJECT_CREATED'
@@ -12,7 +14,7 @@ export const SUBJECT_UPDATE = 'SUBJECT_UPDATE'
 export const SUBJECT_UPDATED = 'SUBJECT_UPDATED'
 export const SUBJECT_LAUNCH = 'SUBJECT_LAUNCH'
 
-export const createSubject = (campaignId, subjectParams) => (dispatch) => {
+export const createSubject = (campaignId: number, subjectParams: SubjectParams) => (dispatch: Dispatch) => {
   dispatch({type: SUBJECT_CREATE})
   const defaultProps = { }
   const params = assign({}, defaultProps, subjectParams)
@@ -27,19 +29,19 @@ export const editingSubjectCancel = () => {
   return { type: SUBJECT_EDIT, subject: null }
 }
 
-export const editSubject = (subject) => {
+export const editSubject = (subject: Subject) => {
   return { type: SUBJECT_EDIT, subject }
 }
 
-export const subjectEditing = (fieldName, value) => (
+export const subjectEditing = (fieldName: string, value: string) => (
   { type: SUBJECT_EDITING, fieldName, value }
 )
 
-export const subjectCreated = (subject) => {
+export const subjectCreated = (subject: Subject) => {
   return { type: SUBJECT_CREATED, subject }
 }
 
-export const subjectFetch = (id) => (dispatch) => {
+export const subjectFetch = (id: number) => (dispatch: Dispatch) => {
   dispatch({type: SUBJECT_FETCH, id: id})
 
   api.fetchSubject(id)
@@ -48,7 +50,7 @@ export const subjectFetch = (id) => (dispatch) => {
     })
 }
 
-export const updateSubject = (campaignId, subjectParams) => (dispatch, getState) => {
+export const updateSubject = (campaignId: number, subjectParams: SubjectParams) => (dispatch: Dispatch, getState: GetState) => {
   const newSubject = assign({}, getState().subjects.editingSubject, subjectParams)
 
   api.updateSubject(campaignId, newSubject)
@@ -60,6 +62,6 @@ export const updateSubject = (campaignId, subjectParams) => (dispatch, getState)
     })
 }
 
-export const subjectUpdated = (subject) => {
+export const subjectUpdated = (subject: Subject) => {
   return { type: SUBJECT_UPDATED, subject }
 }
