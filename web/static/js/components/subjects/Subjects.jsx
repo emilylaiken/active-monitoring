@@ -160,7 +160,7 @@ class Subjects extends Component {
         <SubjectsList
           items={this.props.subjects.items}
           count={this.props.subjects.count}
-          showSubjectForm={this.showSubjectForm}
+          showSubjectForm={() => this.showSubjectForm()}
           onSubjectClick={(subject) => this.editSubject(subject)} />
         <Dialog id='subject-form' visible={showDialog} onHide={() => this.closeSubjectFormModal()} title='Manage Subject'>
           {subjectForm}
