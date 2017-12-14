@@ -1,5 +1,3 @@
-import { targetPage } from "./actions/subjects";
-
 // @flow
 export type Step = string
 export type LanguageCode = string
@@ -44,7 +42,7 @@ export type SubjectParams = {
 
 export type State = {
   timezones: {
-    fetching: boolean,
+    fetching: boolean
   },
   campaign: {
     data: Campaign

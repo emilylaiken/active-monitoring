@@ -1,8 +1,5 @@
 import * as actions from '../actions/subjects'
 import * as itemActions from '../actions/subject'
-import collectionReducer, {defaultFilterProvider} from './collection'
-
-const itemsReducer = (state) => state
 
 const initialState = {
   editingSubject: null,
@@ -11,9 +8,9 @@ const initialState = {
   count: 0,
   filter: null,
   order: null,
-  limit: 3, //FIXME
+  limit: 3,
   page: 1,
-  targetPage: 1,
+  targetPage: 1
 }
 
 const subjectEdit = (state, editingSubject) => (
@@ -55,7 +52,6 @@ const subjectUpdated = (state, subject) => {
   }
 }
 
-
 const receive = (state, items, count, limit, page) => (
   {
     ...state,
@@ -74,14 +70,7 @@ const fetch = (state) => (
   }
 )
 
-const pageXxx = (state, targetPage) => (
-  {
-    ...state,
-    targetPage
-  }
-)
-
-const subjectsReducer = collectionReducer(actions, itemsReducer, defaultFilterProvider, initialState)
+//const subjectsReducer = collectionReducer(actions, itemsReducer, defaultFilterProvider, initialState)
 
 export default (state, action) => {
   switch (action.type) {
@@ -91,7 +80,6 @@ export default (state, action) => {
     case itemActions.SUBJECT_UPDATED: return subjectUpdated(state, action.subject)
     case actions.FETCH: return fetch(state)
     case actions.RECEIVE: return receive(state, action.items, action.count, action.limit, action.page)
-    case actions.PAGE_XXX: return pageXxx(state, action.page)
     default: return state || initialState
   }
 }

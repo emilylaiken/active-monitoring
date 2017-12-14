@@ -56,7 +56,7 @@ class SubjectsList extends Component {
                 { subjects.map(s => <SubjectItem key={s.id} subject={s} onClick={this.props.onSubjectClick} />) }
               </TableBody>
               <TablePagination
-               baseId='subjects-pagination'
+                baseId='subjects-pagination'
                 rows={this.props.count}
                 rowsPerPage={3}
                 rowsPerPageItems={[]}
@@ -132,6 +132,12 @@ class Subjects extends Component {
 
   componentWillMount() {
     this.props.collectionActions.fetchSubjects(this.props.campaignId, this.props.subjects.limit, this.props.subjects.page)
+  }
+
+  componentDidMount() {
+  }
+
+  componentWillUnmount() {
   }
 
   goToPage(page: number) {
