@@ -1,7 +1,9 @@
+// @flow
 import * as api from '../api'
 import { SERVER_ERROR } from './shared'
 import { push } from 'react-router-redux'
 import assign from 'lodash/assign'
+import type { Campaign, CampaignParams, Dispatch, GetState } from '../types'
 
 export const CAMPAIGN_CREATE = 'CAMPAIGN_CREATE'
 export const CAMPAIGN_CREATED = 'CAMPAIGN_CREATED'
@@ -11,7 +13,7 @@ export const CAMPAIGN_UPDATE = 'CAMPAIGN_UPDATE'
 export const CAMPAIGN_UPDATED = 'CAMPAIGN_UPDATED'
 export const CAMPAIGN_LAUNCH = 'CAMPAIGN_LAUNCH'
 
-export const createCampaign = (campaignParams) => (dispatch) => {
+export const createCampaign = (campaignParams: CampaignParams) => (dispatch: Dispatch) => {
   dispatch({type: CAMPAIGN_CREATE})
   const defaultProps = { symptoms: [], langs: [], name: '', audios: [], forwardingCondition: 'any', retryMode: 'sms', retryAfter: '', retryAfterHours: false }
   const params = assign({}, defaultProps, campaignParams)
@@ -23,11 +25,11 @@ export const createCampaign = (campaignParams) => (dispatch) => {
      })
 }
 
-export const campaignCreated = (campaign) => {
+export const campaignCreated = (campaign: Campaign) => {
   return { type: CAMPAIGN_CREATED, campaign }
 }
 
-export const campaignFetch = (id) => (dispatch) => {
+export const campaignFetch = (id: number) => (dispatch: Dispatch) => {
   dispatch({type: CAMPAIGN_FETCH, id: id})
 
   api.fetchCampaign(id)
@@ -40,7 +42,7 @@ export const campaignFetch = (id) => (dispatch) => {
     })
 }
 
-export const campaignUpdate = (attrs) => (dispatch, getState) => {
+export const campaignUpdate = (attrs: CampaignParams) => (dispatch: Dispatch, getState: GetState) => {
   const newCampaign = assign({}, getState().campaign.data, attrs)
 
   dispatch({type: CAMPAIGN_UPDATED, campaign: newCampaign})
@@ -50,11 +52,11 @@ export const campaignUpdate = (attrs) => (dispatch, getState) => {
     })
 }
 
-export const campaignUpdated = (campaign) => {
+export const campaignUpdated = (campaign: Campaign) => {
   return { type: CAMPAIGN_UPDATED, campaign }
 }
 
-export const campaignLaunch = (id) => (dispatch) => {
+export const campaignLaunch = (id: number) => (dispatch: Dispatch) => {
   dispatch({type: CAMPAIGN_LAUNCH, id: id})
 
   api.launchCampaign(id)
