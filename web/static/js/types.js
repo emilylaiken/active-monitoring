@@ -55,7 +55,7 @@ export type State = {
 }
 
 export type Items = {
-  subjects: [Subject],
+  subjects: Subject[],
   count: number
 }
 
