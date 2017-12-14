@@ -26,6 +26,7 @@ class SubjectsList extends Component {
     onPageChange: (page: number) => void,
     onSubjectClick: (subject: Subject) => void,
     currentPage: ?number,
+    rowsPerPage: number,
     count: number,
   }
 
@@ -57,8 +58,9 @@ class SubjectsList extends Component {
               </TableBody>
               <TablePagination
                 rows={this.props.count}
-                rowsPerPage={3}
-                rowsPerPageItems={[]}
+                rowsPerPage={this.props.rowsPerPage}
+                rowsPerPageItems={[this.props.rowsPerPage]}
+                rowsPerPageLabel=''
                 page={this.props.currentPage || 1}
                 onPagination={(start, limit) => this.handlePagination(start, limit)}
               />
@@ -185,6 +187,7 @@ class Subjects extends Component {
       editingSubject,
       page,
       items,
+      limit,
       count
     } = this.props.subjects
 
@@ -208,6 +211,7 @@ class Subjects extends Component {
           items={items}
           count={count}
           currentPage={page}
+          rowsPerPage={limit}
           showSubjectForm={() => this.showSubjectForm()}
           onSubjectClick={(subject) => this.editSubject(subject)}
           onPageChange={(targetPage) => this.goToPage(targetPage)} />
