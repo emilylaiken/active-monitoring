@@ -11,6 +11,7 @@ import TablePagination from 'react-md/lib/DataTables/TablePagination'
 import TableRow from 'react-md/lib/DataTables/TableRow'
 import TableColumn from 'react-md/lib/DataTables/TableColumn'
 import Dialog from 'react-md/lib/Dialogs'
+import CircularProgress from 'react-md/lib/Progress/CircularProgress'
 
 import * as collectionActions from '../../actions/subjects'
 import * as itemActions from '../../actions/subject'
@@ -36,7 +37,7 @@ class SubjectsList extends Component {
     if (subjects.length == 0) {
       return (
         <EmptyListing image='/images/person.svg'>
-          <h5>You have no subjects on this project</h5>
+          <h5>You have no subjects on this campaign</h5>
           <NavLink to='#' onClick={this.props.showSubjectForm}>Add subject</NavLink>
         </EmptyListing>
       )
@@ -188,6 +189,7 @@ class Subjects extends Component {
       page,
       items,
       limit,
+      fetching,
       count
     } = this.props.subjects
 
@@ -201,20 +203,22 @@ class Subjects extends Component {
         onEditPhoneNumber={this.onEditPhoneNumber}
         onEditRegistrationIdentifier={this.onEditRegistrationIdentifier} />
     }
+    let tableOrLoadingIndicator = fetching ? <CircularProgress id='subjects-fetching-progress' /> : (<SubjectsList
+      items={items}
+      count={count}
+      fetching={fetching}
+      currentPage={page}
+      rowsPerPage={limit}
+      showSubjectForm={() => this.showSubjectForm()}
+      onSubjectClick={(subject) => this.editSubject(subject)}
+      onPageChange={(targetPage) => this.goToPage(targetPage)} />)
 
     return (
       <div className='md-grid--no-spacing'>
         <SubNav addButtonHandler={() => this.showSubjectForm()}>
           Subjects
         </SubNav>
-        <SubjectsList
-          items={items}
-          count={count}
-          currentPage={page}
-          rowsPerPage={limit}
-          showSubjectForm={() => this.showSubjectForm()}
-          onSubjectClick={(subject) => this.editSubject(subject)}
-          onPageChange={(targetPage) => this.goToPage(targetPage)} />
+        {tableOrLoadingIndicator}
         <Dialog id='subject-form' visible={showDialog} onHide={() => this.closeSubjectFormModal()} title='Manage Subject'>
           {subjectForm}
         </Dialog>
