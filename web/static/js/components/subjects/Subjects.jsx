@@ -25,7 +25,7 @@ class SubjectsList extends Component {
     showSubjectForm: () => void,
     onPageChange: (page: number) => void,
     onSubjectClick: (subject: Subject) => void,
-    currentPage: number,
+    currentPage: ?number,
     count: number,
   }
 
@@ -45,7 +45,7 @@ class SubjectsList extends Component {
       <div className='md-grid'>
         <div className='md-cell md-cell--12'>
           <Card tableCard>
-            <DataTable plain className='app-listing'>
+            <DataTable plain className='app-listing' baseId='subjects'>
               <TableHeader>
                 <TableRow>
                   <TableColumn>ID</TableColumn>
@@ -56,11 +56,10 @@ class SubjectsList extends Component {
                 { subjects.map(s => <SubjectItem key={s.id} subject={s} onClick={this.props.onSubjectClick} />) }
               </TableBody>
               <TablePagination
-                baseId='subjects-pagination'
                 rows={this.props.count}
                 rowsPerPage={3}
                 rowsPerPageItems={[]}
-                page={this.props.currentPage}
+                page={this.props.currentPage || 1}
                 onPagination={(start, limit) => this.handlePagination(start, limit)}
               />
             </DataTable>
@@ -101,10 +100,13 @@ class Subjects extends Component {
       items: Subject[],
       editingSubject: ?SubjectParams,
       limit: number,
-      page: number
+      page: ?number,
+      targetPage: number,
+      fetching: boolean,
     },
     collectionActions: {
-      fetchSubjects: (campaignId: number, limit: number, page: number) => void
+      fetchSubjects: (campaignId: number, limit: number, targetPage: number) => void,
+      changeTargetPage: (targetPage: number) => void,
     },
     itemActions: {
       createSubject: (campaignId: number, subject: SubjectParams) => void,
@@ -130,18 +132,13 @@ class Subjects extends Component {
     this.props.itemActions.subjectEditing(fieldName, value)
   }
 
-  componentWillMount() {
-    this.props.collectionActions.fetchSubjects(this.props.campaignId, this.props.subjects.limit, this.props.subjects.page)
+  goToPage(targetPage: number) {
+    this.props.collectionActions.changeTargetPage(targetPage)
   }
 
-  componentDidMount() {
-  }
-
-  componentWillUnmount() {
-  }
-
-  goToPage(page: number) {
-    this.props.collectionActions.fetchSubjects(this.props.campaignId, this.props.subjects.limit, page)
+  fetchTargetPage() {
+    const { limit, targetPage } = this.props.subjects
+    this.props.collectionActions.fetchSubjects(this.props.campaignId, limit, targetPage)
   }
 
   createSubject() {
@@ -168,8 +165,29 @@ class Subjects extends Component {
     return 'Subjects!'
   }
 
+  componentDidUpdate() {
+    const {
+      page,
+      targetPage,
+      fetching
+    } = this.props.subjects
+    if (page != targetPage && !fetching) {
+      this.fetchTargetPage()
+    }
+  }
+
+  componentDidMount() {
+    this.fetchTargetPage()
+  }
+
   render() {
-    const { editingSubject } = this.props.subjects
+    const {
+      editingSubject,
+      page,
+      items,
+      count
+    } = this.props.subjects
+
     const showDialog = editingSubject != null
     let subjectForm = null
     if (editingSubject != null) {
@@ -187,12 +205,12 @@ class Subjects extends Component {
           Subjects
         </SubNav>
         <SubjectsList
-          items={this.props.subjects.items}
-          count={this.props.subjects.count}
-          currentPage={1}
+          items={items}
+          count={count}
+          currentPage={page}
           showSubjectForm={() => this.showSubjectForm()}
           onSubjectClick={(subject) => this.editSubject(subject)}
-          onPageChange={(page) => this.goToPage(page)} />
+          onPageChange={(targetPage) => this.goToPage(targetPage)} />
         <Dialog id='subject-form' visible={showDialog} onHide={() => this.closeSubjectFormModal()} title='Manage Subject'>
           {subjectForm}
         </Dialog>

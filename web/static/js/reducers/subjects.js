@@ -8,8 +8,8 @@ const initialState = {
   count: 0,
   filter: null,
   order: null,
-  limit: 3,
-  page: 1,
+  limit: 50,
+  page: null,
   targetPage: 1
 }
 
@@ -70,7 +70,12 @@ const fetch = (state) => (
   }
 )
 
-//const subjectsReducer = collectionReducer(actions, itemsReducer, defaultFilterProvider, initialState)
+const changeTargetPage = (state, targetPage) => (
+  {
+    ...state,
+    targetPage
+  }
+)
 
 export default (state, action) => {
   switch (action.type) {
@@ -80,6 +85,7 @@ export default (state, action) => {
     case itemActions.SUBJECT_UPDATED: return subjectUpdated(state, action.subject)
     case actions.FETCH: return fetch(state)
     case actions.RECEIVE: return receive(state, action.items, action.count, action.limit, action.page)
+    case actions.CHANGE_TARGET_PAGE: return changeTargetPage(state, action.page)
     default: return state || initialState
   }
 }
