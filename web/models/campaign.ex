@@ -16,6 +16,10 @@ defmodule ActiveMonitoring.Campaign do
     field :channel, :string
     field :timezone, :string
     field :monitor_duration, :integer
+    field :retry_config, :string
+    field :retry_mode, :string
+    field :retry_after, Ecto.Time
+    field :retry_after_hours, :boolean
     # field :alert_recipients, {:array, :string}
     # field :additional_fields, {:array, :string}
 
@@ -27,9 +31,10 @@ defmodule ActiveMonitoring.Campaign do
 
   def changeset(model, params \\ %{}) do
     model
-    |> cast(params, [:name, :symptoms, :forwarding_number, :forwarding_condition, :audios, :langs, :channel, :user_id, :additional_information, :timezone, :monitor_duration])
+    |> cast(params, [:name, :symptoms, :forwarding_number, :forwarding_condition, :audios, :langs, :channel, :user_id, :additional_information, :timezone, :monitor_duration, :retry_config, :retry_mode, :retry_after, :retry_after_hours])
     |> validate_inclusion(:additional_information, ["zero", "optional", "compulsory"])
     |> validate_inclusion(:forwarding_condition, ["any", "all"])
+    |> validate_inclusion(:retry_mode, ["sms", "ivr"])
     |> assoc_constraint(:user)
   end
 

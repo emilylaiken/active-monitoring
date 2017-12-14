@@ -31,6 +31,10 @@ defmodule ActiveMonitoring.CampaignsView do
       additional_information: campaign.additional_information,
       started_at: campaign.started_at,
       monitor_duration: campaign.monitor_duration,
+      retry_config: campaign.retry_config,
+      retry_mode: campaign.retry_mode,
+      retry_after: campaign.retry_after,
+      retry_after_hours: campaign.retry_after_hours,
       timezone: campaign.timezone,
       channel: campaign.channel
     }
