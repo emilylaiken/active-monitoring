@@ -16,6 +16,18 @@ export type Campaign = {
   channel: ?string,
 }
 
+export type CampaignParams = {
+  id?: number,
+  audios?: Audio[],
+  langs?: string[],
+  symptoms?: string[][],
+  additionalInformation?: ?string,
+  timezone?: Timezone,
+  forwardingNumber?: ?string,
+  monitorDuration?: ?number,
+  channel?: ?string,
+}
+
 export type Subject = {
   id: number,
   phoneNumber: string,
@@ -32,6 +44,10 @@ export type State = {
   timezones: {
     fetching: boolean
   },
+  campaign: {
+    data: Campaign
+  },
+  campaigns: Campaign,
   subjects: {
     editingSubject: Subject,
     targetPage: number
