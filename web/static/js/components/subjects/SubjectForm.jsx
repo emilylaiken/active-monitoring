@@ -22,13 +22,13 @@ class SubjectForm extends Component {
           <TextField
             id='registration-identifier'
             label='ID'
-            defaultValue={subject.registrationIdentifier}
+            defaultValue={subject.registrationIdentifier || ''}
             onBlur={e => onEditRegistrationIdentifier(e.target.value)}
           />
           <TextField
             id='phone-number'
             label='Phone Number'
-            defaultValue={subject.phoneNumber}
+            defaultValue={subject.phoneNumber || ''}
             onBlur={e => onEditPhoneNumber(e.target.value)}
           />
           <Button primary onClick={onSubmit} raised label='Save' />
