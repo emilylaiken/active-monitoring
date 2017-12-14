@@ -1,11 +1,24 @@
+// @flow
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import { fetchTimezones } from '../../actions/timezones'
 import { formatTimezone } from './util'
 import SelectField from 'react-md/lib/SelectFields'
 import { connect } from 'react-redux'
+import type { Dispatch } from '../../types'
+
+type Props = {
+  timezones: {
+    items: string[] // eslint-disable-line react/no-unused-prop-types
+  },
+  selected: string,
+  readOnly?: boolean,
+  onEdit: (timezone: string) => void,
+  dispatch: Dispatch,
+}
 
 class TimezoneDropdown extends Component {
+  props: Props
+
   componentDidMount() {
     const { dispatch } = this.props
     dispatch(fetchTimezones())
@@ -34,14 +47,6 @@ class TimezoneDropdown extends Component {
       />
     )
   }
-}
-
-TimezoneDropdown.propTypes = {
-  dispatch: PropTypes.func.isRequired,
-  timezones: PropTypes.object,
-  selected: PropTypes.string,
-  onEdit: PropTypes.func,
-  readOnly: PropTypes.bool
 }
 
 const mapStateToProps = (state) => ({
